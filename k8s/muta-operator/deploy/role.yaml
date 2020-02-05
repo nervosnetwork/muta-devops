@@ -7,9 +7,9 @@ metadata:
 rules:
 - apiGroups:
   - ""
-  - "extensions"
-  - "apps"
-  - "batch"
+  - extensions
+  - apps
+  - batch
   resources:
   - pods
   - services
