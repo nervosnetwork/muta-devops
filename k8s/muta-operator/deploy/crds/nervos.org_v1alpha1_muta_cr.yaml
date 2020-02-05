@@ -9,8 +9,8 @@ spec:
     - stable-network-corrupt
     - stable-network-delay
   benchmark: # Create cronjob to execute https://github.com/nervosnetwork/muta-benchmark
-    duration: "10s"
-    every: "10m"
+    duration: "30s"
+    schedule: "*/5 * * * *"   # minutes, hours, days, months, weeks
   size: 3 # Node numbers
   config: # see https://github.com/nervosnetwork/muta/blob/master/devtools/chain/config.toml
     data_path: "/app/data"

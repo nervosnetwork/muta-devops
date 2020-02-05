@@ -58,7 +58,7 @@ type MutaSpec struct {
 	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
 	Image     string        `json:"image"`
 	Chaos     []ChaosType   `json:"chaos"`
-	Benchmark Benchmark     `json:"benchmark"`
+	Benchmark *Benchmark    `json:"benchmark"`
 	Size      uint64        `json:"size"`
 	Config    Config        `json:"config"`
 	Genesis   ConfigGenesis `json:"genesis" toml:"genesis"`
@@ -67,7 +67,7 @@ type MutaSpec struct {
 // Benchmark defines the parameters of benchmark
 type Benchmark struct {
 	Duration string `json:"duration"`
-	Every    string `json:"every"`
+	Schedule string `json:"schedule"`
 }
 
 type NodeCrypto struct {

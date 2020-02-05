@@ -328,7 +328,11 @@ func (in *MutaSpec) DeepCopyInto(out *MutaSpec) {
 		*out = make([]ChaosType, len(*in))
 		copy(*out, *in)
 	}
-	out.Benchmark = in.Benchmark
+	if in.Benchmark != nil {
+		in, out := &in.Benchmark, &out.Benchmark
+		*out = new(Benchmark)
+		**out = **in
+	}
 	in.Config.DeepCopyInto(&out.Config)
 	in.Genesis.DeepCopyInto(&out.Genesis)
 	return
