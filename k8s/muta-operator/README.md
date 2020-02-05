@@ -1,5 +1,5 @@
 ## Muta Operator
-Muta Operator manages Muta nodes on kubernetes by monitoring Muta CRD(Custom Resource Definitions)
+Muta Operator manages Muta nodes on kubernetes by Muta CRD(Custom Resource Definitions)
 
 ## Features
 - Automatically creates a muta chain with the specified number of nodes.
