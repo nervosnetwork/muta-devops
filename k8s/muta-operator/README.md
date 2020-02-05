@@ -21,7 +21,7 @@ $ kubectl -f deploy/crds
 $ kubectl -f deploy
 
 // check if the installation is complete.
-$ kubectl get StatefulSet -n mutadev
+$ kubectl get pods -n mutadev
 NAME                                 READY   STATUS    RESTARTS   AGE
 muta-operator-66c8bd6568-l5dt8 1/1     1/1   Running     0        152m
 
