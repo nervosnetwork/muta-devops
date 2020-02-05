@@ -222,11 +222,10 @@ func (r *ReconcileMuta) createMutaChain(instance *nervosv1alpha1.Muta) error {
 		if err := r.createNode(instance, fmt.Sprintf("%s-%d", chainName, i)); err != nil {
 			return err
 		}
-
-		if instance.Spec.Benchmark != nil {
-			if err := r.createBenchmark(instance, chainName); err != nil {
-				return err
-			}
+	}
+	if instance.Spec.Benchmark != nil {
+		if err := r.createBenchmark(instance, chainName); err != nil {
+			return err
 		}
 	}
 	return nil
@@ -421,6 +420,7 @@ func (r *ReconcileMuta) createBenchmark(instance *nervosv1alpha1.Muta, name stri
 									Args:  []string{"-d", instance.Spec.Benchmark.Duration, url},
 								},
 							},
+							RestartPolicy: corev1.RestartPolicyNever,
 						},
 					},
 				},
