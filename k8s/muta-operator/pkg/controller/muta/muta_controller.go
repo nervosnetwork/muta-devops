@@ -223,8 +223,10 @@ func (r *ReconcileMuta) createMutaChain(instance *nervosv1alpha1.Muta) error {
 			return err
 		}
 	}
+
 	if instance.Spec.Benchmark != nil {
-		if err := r.createBenchmark(instance, chainName); err != nil {
+		firstNode := fmt.Sprintf("%s-%d", chainName, 0)
+		if err := r.createBenchmark(instance, firstNode); err != nil {
 			return err
 		}
 	}
