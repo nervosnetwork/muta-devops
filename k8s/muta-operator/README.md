@@ -1,6 +1,10 @@
 ## Muta Operator
 Muta Operator manages Muta nodes on kubernetes by monitoring Muta CRD(Custom Resource Definitions)
 
+## Features
+- Automatically creates a muta chain with the specified number of nodes.
+- Allows you to specify and combine multiple chaos network attacks (option)
+- Automatically allows a cronjob to stress test the chain (option).
 ## Install on kubernetes (macOS)
 ```sh
 // install operator-sdk
