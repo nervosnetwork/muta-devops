@@ -79,7 +79,7 @@ async function getNodeDataList() {
 
 var records = new Map();
 async function watch_stopped() {
-    console.log(new Date(), "Check once")
+    console.log(new Date(), "Watch stopped")
     var running = await getNodeDataList()
     var stopped = new Map();
 
@@ -127,8 +127,9 @@ async function watch_alldata() {
 async function watch_request() {
     var update_id = 0;
     while (true) {
+        console.log(new Date(), "Watch request")
         const offset = update_id + 1;
-        const res = await request.get(`https://api.telegram.org/bot${cTgToken}/getUpdates?offset=${offset}&timeout=6`);
+        const res = await request.get(`https://api.telegram.org/bot${cTgToken}/getUpdates?offset=${offset}&timeout=300`);
         const data = JSON.parse(res);
 
         for (const e of data.result) {
