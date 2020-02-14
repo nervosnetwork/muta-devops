@@ -150,6 +150,15 @@ async function watch_request() {
                 }
                 await warn(JSON.stringify(await getNodeData(nodename), undefined, 4))
             }
+            if (args[0] === '/get-node-all') {
+                const l = await getNodeDataList();
+                const b = new Map(Array.from(l.entries()));
+                const m = {};
+                for (const [k, v] of b.entries()) {
+                    m[k] = v;
+                }
+                await warn(JSON.stringify(m, undefined, 4));
+            }
             if (args[0] === '/get-node-list') {
                 const tagsname = args[1]
                 if (!tagsname) {
