@@ -33,6 +33,10 @@ async function warn(text) {
     }
 }
 
+function formatData(nodeData) {
+    return nodeData.height;
+}
+
 async function getNodeData(name) {
     var res = await k8sCoreApi.readNamespacedService(name, cNameSpace);
 
@@ -155,7 +159,7 @@ async function watch_request() {
                 const b = new Map(Array.from(l.entries()));
                 const m = {};
                 for (const [k, v] of b.entries()) {
-                    m[k] = v;
+                    m[k] = formatData(v);
                 }
                 await warn(JSON.stringify(m, undefined, 4));
             }
@@ -168,12 +172,12 @@ async function watch_request() {
                 const b = new Map(Array.from(l.entries()).filter(e => e[1].tagName === tagsname));
                 const m = {};
                 for (const [k, v] of b.entries()) {
-                    m[k] = v;
+                    m[k] = formatData(v);
                 }
                 await warn(JSON.stringify(m, undefined, 4));
             }
             if (args[0] === '/help') {
-                await warn('/get-node [node-name]\r\n/get-node-list [node-tags]');
+                await warn('/get-node [node-name]\r\n/get-node-all\r\n/get-node-list [node-tags]');
             }
         }
     }
