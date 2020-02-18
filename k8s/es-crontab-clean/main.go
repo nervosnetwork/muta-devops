@@ -10,13 +10,13 @@ import (
 )
 
 var (
-	cEsURL = flag.String("es", "127.0.0.1:9200", "")
+	cEsURL = flag.String("es", "http://127.0.0.1:9200", "")
 	cN     = flag.Int("n", 7, "")
 )
 
 func main() {
 	flag.Parse()
-	res, err := http.Get("http://" + *cEsURL + "/_cat/indices")
+	res, err := http.Get(*cEsURL + "/_cat/indices")
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -37,7 +37,7 @@ func main() {
 			if time.Now().Sub(date).Hours() > float64(*cN)*24 {
 				log.Println("Try to delete it")
 				func() {
-					req, err := http.NewRequest("DELETE", "http://"+*cEsURL+"/"+idx, http.NoBody)
+					req, err := http.NewRequest("DELETE", *cEsURL+"/"+idx, http.NoBody)
 					if err != nil {
 						log.Panicln(err)
 					}
