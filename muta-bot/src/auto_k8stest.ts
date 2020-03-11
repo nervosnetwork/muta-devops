@@ -1,4 +1,5 @@
-import * as fs from 'fs'
+import * as fs from 'fs';
+import { promisify } from 'util';
 
 import * as probot from "probot";
 import * as shell from 'shelljs';
@@ -19,16 +20,11 @@ const kc = new k8s.KubeConfig();
 kc.loadFromFile(config.KUBE_CONFIG);
 const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
 
-function withChdir(p: string, callback: () => void): void {
-  const pwd = process.cwd()
-  process.chdir(p)
-  callback()
-  process.chdir(pwd)
-}
-
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+const execAsync = promisify(shell.exec);
 
 async function getNodeData(name) {
   var res = await k8sCoreApi.readNamespacedService(name, config.KUBE_NAMESPACE);
@@ -107,19 +103,20 @@ async function runOnK8s(
   destName: string,
   kubeName: string | undefined,
 ) {
-  withChdir(cData, function () {
-    shell.exec(`git clone -b ${remoteBranch} ${remoteRepoAddress} ${destName}`)
-    withChdir(destName, function () {
-      if (commitID !== undefined) {
-        shell.exec(`git checkout ${commitID}`)
-      } else {
-        commitID = shell.exec('git rev-parse --short HEAD').stdout.trim();
-      }
-      shell.exec('make docker-build');
-      shell.exec('make docker-push');
-    })
-    shell.rm('-rf', destName);
-  })
+  shell.pushd(cData)
+  await execAsync(`git clone -b ${remoteBranch} ${remoteRepoAddress} ${destName}`)
+  shell.pushd(destName)
+  if (commitID !== undefined) {
+    await execAsync(`git checkout ${commitID}`)
+  } else {
+    var _code, output = await execAsync('git rev-parse --short HEAD');
+    commitID = output.trim()
+  }
+  await execAsync('make docker-build');
+  await execAsync('make docker-push');
+  shell.popd()
+  shell.rm('-rf', destName);
+  shell.popd()
 
   var txt = "";
   if (!kubeName) {
@@ -129,11 +126,11 @@ async function runOnK8s(
   txt = txt.replace('mutadev/muta:latest', 'mutadev/muta:' + commitID);
   txt = txt.replace('muta-example', kubeName);
   fs.writeFileSync(`${config.ROOT_K8SYAML_PATH}/kube_${commitID}.yaml`, txt);
-  shell.exec(`kubectl delete -n mutadev muta.nervos.org ${kubeName}`);
+  await execAsync(`kubectl delete -n mutadev muta.nervos.org ${kubeName}`);
   await sleep(60 * 1000);
-  shell.exec(`kubectl apply -f ${config.ROOT_K8SYAML_PATH}/kube_${commitID}.yaml`);
-  setTimeout(function () {
-    shell.exec(`kubectl delete -f ${config.ROOT_K8SYAML_PATH}/kube_${commitID}.yaml`);
+  await execAsync(`kubectl apply -f ${config.ROOT_K8SYAML_PATH}/kube_${commitID}.yaml`);
+  setTimeout(async function () {
+    await execAsync(`kubectl delete -f ${config.ROOT_K8SYAML_PATH}/kube_${commitID}.yaml`);
   }, cTimeout)
 
   if (!vData.has(kubeName)) {
@@ -189,7 +186,7 @@ async function runOnK8s(
 export async function pullRequestHandler(context: probot.Context) {
   const payload = context.payload;
   if (payload.pull_request.base.repo.full_name !== config.CODE_REPO) {
-    console.log('Ignore, repo is', payload.pull_request.head.repo.full_name)
+    console.log('Ignore, repo is', payload.pull_request.base.repo.full_name)
     return
   }
   if (!cAction.includes(payload.action)) {
