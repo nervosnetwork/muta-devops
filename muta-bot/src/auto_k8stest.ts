@@ -128,7 +128,11 @@ async function runOnK8s(
   fs.writeFileSync(`${config.ROOT_K8SYAML_PATH}/kube_${commitID}.yaml`, txt);
   await execAsync(`kubectl delete -n mutadev muta.nervos.org ${kubeName}`);
   await sleep(60 * 1000);
-  await execAsync(`kubectl apply -f ${config.ROOT_K8SYAML_PATH}/kube_${commitID}.yaml`);
+  try {
+    await execAsync(`kubectl apply -f ${config.ROOT_K8SYAML_PATH}/kube_${commitID}.yaml`);
+  } catch (err) {
+    // Safe to ignore
+  }
   setTimeout(async function () {
     await execAsync(`kubectl delete -f ${config.ROOT_K8SYAML_PATH}/kube_${commitID}.yaml`);
   }, cTimeout)
