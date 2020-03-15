@@ -26,6 +26,7 @@
     "home": "^2.0.0",
     "js-yaml": "^3.13.1",
     "lowdb": "^1.0.0",
+    "messaging-api-telegram": "^0.8.2",
     "moment": "^2.24.0",
     "probot": "^9.5.3",
     "probot-scheduler": "^2.0.0-beta.1",
