@@ -9,6 +9,7 @@ console.log("bot config:", config);
 export const WEEKLY_REPO = config.weekly_repo;
 export const CODE_REPO = config.code_repo;
 export const CODE_BRANCH = config.code_branch;
+export const DEV_MODE = config.dev_mode;
 
 export const ROOT_PATH = home.resolve('~/.muta-bot');
 export const ROOT_K8SYAML_PATH = path.join(ROOT_PATH, 'k8s');
