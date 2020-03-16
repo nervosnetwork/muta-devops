@@ -27,8 +27,8 @@ export interface AllTasks {
     delayIssues: Octokit.IssuesGetResponse[];
 }
 
-const log = config.dev ? function (...params: any[]) {
-} : console.log
+const log = config.dev ? console.log : function (...params: any[]) {
+}
 
 export default function (app) {
     createScheduler(app, {
