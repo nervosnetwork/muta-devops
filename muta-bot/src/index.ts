@@ -10,7 +10,7 @@ import * as config from "./config";
 const PROJECT_COLUMN_TODO = "To do";
 const PROJECT_COLUMN_IN_PROGRESS = "In progress";
 const PROJECT_COLUMN_IN_REVIEW = "In review";
-const PROJECT_COLUMN_DONW = "Done";
+const PROJECT_COLUMN_DONE = "Done";
 
 const LABEL_TODO = "bot:todo";
 const LABEL_IN_PROGRESS = "bot:in-progress";
@@ -181,7 +181,7 @@ export = (app: Application) => {
           await issueMoveColumn(
             context,
             context.payload.issue.milestone.title,
-            PROJECT_COLUMN_DONW
+            PROJECT_COLUMN_DONE
           )
         ) {
           labels.push(LABEL_DONE);
