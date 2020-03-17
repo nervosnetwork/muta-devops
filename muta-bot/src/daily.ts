@@ -4,8 +4,6 @@ import moment from "moment";
 import fileDB from "./db";
 import * as config from "./config"
 
-const tg = require(`../env/tg`);
-
 import {
   WEEKLY_PROJECT_COLUMN_TODO,
   PROJECT_COLUMN_IN_PROGRESS, PROJECT_COLUMN_IN_REVIEW, PROJECT_COLUMN_DONE,
@@ -365,7 +363,7 @@ async function getMembersRemind(context: Context, daily_issue: Octokit.IssuesGet
     hashCommented[comment.user.login] = true
   }
 
-  return tg['members'].filter(item => {
+  return config.MEMBERS.filter(item => {
     return !hashCommented[item['github']]
   })
     .map(s => `- @${s['telegram'] ? s['telegram'] : s['github']}`)
