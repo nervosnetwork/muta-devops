@@ -4,7 +4,7 @@ import moment from "moment";
 import fileDB from "./db";
 import * as config from "./config"
 
-const tg = require(`../tg`);
+const tg = require(`../env/tg`);
 
 import {
   WEEKLY_PROJECT_COLUMN_TODO,
