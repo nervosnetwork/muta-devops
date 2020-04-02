@@ -1,4 +1,4 @@
-devops_path: "/home/muta/muta-devops"
+devops_path: "/muta/deploy/muta-devops"
 muta_path: "{{ devops_path }}/muta"
 configs_path: "{{ devops_path }}/configs"
 data_dir: "{{ devops_path }}/chain-data"

@@ -1,0 +1,73 @@
+---
+- name: init log system on distributed muta nodes
+  hosts: muta-dev
+  user: root
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  vars_files:
+    - vars/path.yml
+  tasks:
+    - name: ensure dirs created
+      file: path="{{ item }}" state=directory mode=777
+      with_items:
+        - "{{ devops_path }}"
+        - "{{ muta_path }}"
+        - "{{ configs_path }}"
+        - "{{ data_dir }}"
+        - "{{ devops_path }}/es-data"
+        - "{{ devops_path }}/kibana-data"
+        - "{{ devops_path }}/fluent-bit-data"
+    - name: copy devops repo for ci
+      synchronize:
+        src: "{{ playbook_dir }}"
+        dest: "{{ devops_path }}/devops/"
+        rsync_opts:
+          - "--exclude=*/node_modules"
+          - "--exclude=*/.git"
+          - "--exclude=*/.vagrant"
+          - "--exclude=*/.ansible_fact_cache"
+    - name: Start service docker, if not started
+      service:
+        name: docker
+        state: started
+      become: true
+    - name: copy elasticsearch config
+      copy:
+        src: "{{ item }}"
+        dest: "{{ configs_path }}/{{ item }}"
+        mode: '0777'
+      with_items:
+        - elasticsearch.yml
+      notify: restart elasticsearch
+    - name: copy kibana config
+      copy:
+        src: "{{ item }}"
+        dest: "{{ configs_path }}/{{ item }}"
+        mode: '0777'
+      with_items:
+        - kibana.yml
+      notify: restart kibana
+    - name: start elasticsearch
+      docker_container:
+        name: es
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.4.2
+        network_mode: host
+        volumes:
+            - "{{ configs_path }}/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
+            - "{{ devops_path }}/es-data:/usr/share/elasticsearch/data"
+        env:
+            discovery.type: single-node
+            ES_JAVA_OPTS: '-Xms30g -Xmx30g'
+    - name: start kibana
+      docker_container:
+        name: kibana
+        image: docker.elastic.co/kibana/kibana:7.4.2
+        network_mode: host
+        volumes:
+            - "{{ configs_path }}/kibana.yml:/usr/share/kibana/config/kibana.yml"
+            - "{{ devops_path }}/kibana-data:/usr/share/kibana/data"
+  handlers:
+    - name: restart elasticsearch
+      command: "docker restart elasticsearch"
+    - name: restart kibana
+      command: "docker restart kibana"
