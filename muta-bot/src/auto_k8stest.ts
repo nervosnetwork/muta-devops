@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import { promisify } from 'util';
+import * as child_process from 'child_process';
 
 import * as probot from "probot";
 import * as shell from 'shelljs';
@@ -20,7 +21,7 @@ const kc = new k8s.KubeConfig();
 kc.loadFromFile(config.KUBE_CONFIG);
 const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
 
-function sleep(ms) {
+async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -227,3 +228,18 @@ export async function pullRequestHandler(context: probot.Context) {
     }
   }, 1000)
 }
+
+
+function init() {
+  fs.readdirSync(config.ROOT_K8SYAML_PATH).forEach(file => {
+    console.log(`find ${file}, try release it`)
+    child_process.exec(`kubectl delete -f ${file}`, { cwd: config.ROOT_K8SYAML_PATH }, (err, stdout, stderr) => {
+      if (err) { console.log(err) }
+      child_process.exec(`rm ${file}`, { cwd: config.ROOT_K8SYAML_PATH }, (err, stdout, stderr) => {
+        if (err) { console.log(err) }
+      });
+    });
+  });
+}
+
+init();
