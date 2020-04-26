@@ -134,9 +134,9 @@ async function runOnK8s(
   kubeName: string | undefined,
   timeout: number,
 ) {
-  // await context.github.issues.createComment(
-  //   context.issue({ body: "Accept request." })
-  // );
+  await context.github.issues.createComment(
+    context.issue({ body: "Accept request." })
+  );
   await execAsync(`git clone -b ${remoteBranch} ${remoteRepoAddress} ${destName}`, { cwd: cData })
   if (commitID !== undefined) {
     await execAsync(`git checkout ${commitID}`, { cwd: cData + '/' + destName })
@@ -176,9 +176,9 @@ async function runOnK8s(
   }
   const vDataIndex = vData.get(kubeName)!.push({ stop: false, data: new Array() }) - 1;
 
-  // await context.github.issues.createComment(
-  //   context.issue({ body: `Docker builded. "mutadev/muta:${commitID}"\nRun chaos test on k8s named "${kubeName}"\nTest lasts 4 hours` })
-  // );
+  await context.github.issues.createComment(
+    context.issue({ body: `Docker builded. "mutadev/muta:${commitID}"\nRun chaos test on k8s named "${kubeName}"\nTest lasts 4 hours` })
+  );
   await sleep(60 * 1000);
 
   for (var i = 0; i < cSteps; i++) {
