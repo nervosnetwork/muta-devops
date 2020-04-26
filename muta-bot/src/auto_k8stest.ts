@@ -27,6 +27,30 @@ async function sleep(ms) {
 
 const execAsync = promisify(shell.exec);
 
+async function getBenchResult(name: string): Promise<string> {
+  const r = await k8sCoreApi.listNamespacedPod("mutadev")
+
+  var n = 0;
+
+  while (true) {
+    for (const e of r.body.items) {
+
+      if ((e.spec!.containers[0].image == "mutadev/muta-benchmark:latest") && (e.metadata!.name!.startsWith(name))) {
+        console.log(1)
+        if (e.status!.conditions![0].reason === 'PodCompleted') {
+          return (await k8sCoreApi.readNamespacedPodLog(e.metadata!.name!, 'mutadev')).body
+        }
+      }
+    }
+    n += 1
+    if (n > 64) {
+      return ''
+    }
+    await new Promise(resolve => setTimeout(resolve, 60 * 1000));
+  }
+}
+
+
 async function getNodeData(name) {
   var res = await k8sCoreApi.readNamespacedService(name, config.KUBE_NAMESPACE);
   var dst = function (): string {
@@ -110,9 +134,9 @@ async function runOnK8s(
   kubeName: string | undefined,
   timeout: number,
 ) {
-  await context.github.issues.createComment(
-    context.issue({ body: "Accept request." })
-  );
+  // await context.github.issues.createComment(
+  //   context.issue({ body: "Accept request." })
+  // );
   await execAsync(`git clone -b ${remoteBranch} ${remoteRepoAddress} ${destName}`, { cwd: cData })
   if (commitID !== undefined) {
     await execAsync(`git checkout ${commitID}`, { cwd: cData + '/' + destName })
@@ -152,9 +176,9 @@ async function runOnK8s(
   }
   const vDataIndex = vData.get(kubeName)!.push({ stop: false, data: new Array() }) - 1;
 
-  await context.github.issues.createComment(
-    context.issue({ body: `Docker builded. "mutadev/muta:${commitID}"\nRun chaos test on k8s named "${kubeName}"\nTest lasts 4 hours` })
-  );
+  // await context.github.issues.createComment(
+  //   context.issue({ body: `Docker builded. "mutadev/muta:${commitID}"\nRun chaos test on k8s named "${kubeName}"\nTest lasts 4 hours` })
+  // );
   await sleep(60 * 1000);
 
   for (var i = 0; i < cSteps; i++) {
@@ -187,8 +211,9 @@ async function runOnK8s(
       txt += line.join('|')
       txt += '\n';
     }
+    const benchout = await getBenchResult(kubeName);
     await context.github.issues.createComment(
-      context.issue({ body: headLine.join('|') + '\n' + prefixLine.join('|') + '\n' + txt })
+      context.issue({ body: headLine.join('|') + '\n' + prefixLine.join('|') + '\n' + txt + '\n' + '```' + benchout + '```' })
     );
     vData.delete(kubeName);
   }
