@@ -34,11 +34,15 @@ async function getBenchResult(name: string): Promise<string> {
 
   while (true) {
     for (const e of r.body.items) {
-
-      if ((e.spec!.containers[0].image == "mutadev/muta-benchmark:latest") && (e.metadata!.name!.startsWith(name))) {
-        console.log(1)
+      if ((e.spec!.containers[0].image!.startsWith("mutadev/muta-benchmark")) && (e.metadata!.name!.startsWith(name))) {
         if (e.status!.conditions![0].reason === 'PodCompleted') {
-          return (await k8sCoreApi.readNamespacedPodLog(e.metadata!.name!, 'mutadev')).body
+          const a = (await k8sCoreApi.readNamespacedPodLog(e.metadata!.name!, 'mutadev')).body;
+          const b = a.split('\n').filter(e => e);
+          const c = JSON.parse(b[b.length - 1]);
+          c.blocks = undefined;
+          c.start = undefined;
+          c.end = undefined;
+          return JSON.stringify(c, undefined, 2)
         }
       }
     }
