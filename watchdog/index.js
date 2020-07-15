@@ -20,6 +20,9 @@ const k8sCoreApi = kc.makeApiClient(k8s.CoreV1Api);
 
 async function run() {
     console.log(process.env);
+    console.log("watchdog start, first sleep 5m");
+    await sleep(timestring("5m") * 1000);
+
     const nodeEndpoints = await getNodeEndPoints(APP_NAMESPACE, APP_NAME, APP_GRAPHQL_URL, APP_PORT);
 
     if (nodeEndpoints.length === 0) {
@@ -49,20 +52,19 @@ async function getNodeEndPoints(ns, appName, graphql, appPort) {
     const res = await k8sCoreApi.listNamespacedService(ns);
     const services = res.body.items.filter(e => e.metadata.name.startsWith(appName));
 
-    const nodeEndpoints = services.map(service => `http://${service.metadata.name}:${appPort}/${graphql}`);
+    const nodeEndpoints = services.map(service => `http://${service.metadata.name}.${ns}:${appPort}/${graphql}`);
     return nodeEndpoints;
 }
 
 async function runJob(nodeEndpoints, duration, gap, chainID, cpu) {
     while (true) {
         // run benchmark
-        console.log(`[job:benchmark] start`);
+        const command = `muta-bench -d ${duration} -c ${nodeEndpoints.length * 3} --gap ${gap} --chain-id ${chainID} --cpu ${cpu} ${nodeEndpoints.join(" ")}`;
+        console.log(`[job:benchmark] start ${command}`);
         await new Promise((resolve) => {
-            const cp = shell.exec(`muta-bench -d ${duration} -c ${nodeEndpoints.length * 3} --gap ${gap} --chain-id ${chainID} --cpu ${cpu} ${nodeEndpoints.join(" ")}`, {
-                async: true,
-            });
+            const cp = shell.exec(command, { async: true });
 
-            cp.stdout.pipe(process.stdout);
+            cp.on("data", console.log);
             cp.on('exit', function () {
                 resolve()
             })
