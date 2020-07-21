@@ -1,10 +1,11 @@
+const path = require('path');
 const k8s = require('@kubernetes/client-node');
 const { Muta } = require("@mutadev/muta-sdk");
 const shell = require('shelljs');
 const timestring = require('timestring')
 
 const WATCH_DURATION = process.env.WATCH_DURATION ? process.env.WATCH_DURATION : "3h";
-const APP_NAMESPACE = process.env.MUTA_NAMESPACE ? process.env.MUTA_NAMESPACE : 'mutadev';
+const APP_NAMESPACE = process.env.APP_NAMESPACE ? process.env.APP_NAMESPACE : 'mutadev';
 const APP_NAME = process.env.APP_NAME;
 const APP_PORT = process.env.APP_PORT ? process.env.APP_PORT : '8080';
 const APP_GRAPHQL_URL = process.env.APP_GRAPHQL_URL ? process.env.APP_GRAPHQL_URL : 'graphql';
@@ -57,15 +58,19 @@ async function getNodeEndPoints(ns, appName, graphql, appPort) {
 }
 
 async function runJob(nodeEndpoints, duration, gap, chainID, cpu) {
+    const benchJobPath = path.join(__dirname, "node_modules/.bin/muta-bench");
+    console.log(`[job:benchmark] bin path ${benchJobPath}`);
+
     while (true) {
         // run benchmark
-        const command = `muta-bench -d ${duration} -c ${nodeEndpoints.length * 3} --gap ${gap} --chain-id ${chainID} --cpu ${cpu} ${nodeEndpoints.join(" ")}`;
+        const command = `node ${benchJobPath} -d ${duration} -c ${nodeEndpoints.length * 3} --gap ${gap} --chain-id ${chainID} --cpu ${cpu} ${nodeEndpoints.join(" ")}`;
         console.log(`[job:benchmark] start ${command}`);
         await new Promise((resolve) => {
             const cp = shell.exec(command, { async: true });
 
-            cp.on("data", console.log);
-            cp.on('exit', function () {
+            cp.on("message", console.log);
+            cp.on('close', (code, signal) => {
+                console.log(`[job:benchmark] benchmark job close. code ${code} signal ${signal}`);
                 resolve()
             })
         });
