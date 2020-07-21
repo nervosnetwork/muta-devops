@@ -91,7 +91,7 @@ async function runCheckStatus(nodeEndpoints) {
     while (true) {
         let last_list_height = Array.from({ length: clients.length }).fill(0);
 
-        const list_height = await Promise.all(clients.map(client => client.getLatestBlockHeight()));
+        const list_height = await retryGetHeight(clients);
 
         console.log(`[status] the height of all node ${list_height}`);
 
@@ -110,4 +110,24 @@ async function runCheckStatus(nodeEndpoints) {
 
 function sleep(ms) {
     return new Promise(r => setTimeout(r, ms));
+}
+
+async function retryGetHeight(clients) {
+    const iter = Array.from({ length: 10 }).map((_ele, i) => i);
+
+    for (const counter of iter) {
+        try {
+            const list_height = await Promise.all(clients.map(client => client.getLatestBlockHeight()));
+            return list_height;
+        } catch (err) {
+            console.error(`[status]: get height error ${err} counter ${counter}`);
+
+            if (counter >= iter.length) {
+                console.error("[status]: retry reach limit");
+                throw err;
+            }
+
+            await sleep(1000 * 5); // sleep 5s
+        }
+    }
 }
