@@ -1,0 +1,40 @@
+version: '3'
+services:
+  # node-exporter:
+  #   image: quay.io/prometheus/node-exporter:v0.18.1
+  #   container_name: muta_node_exporter
+  #   command:
+  #     - '--path.rootfs=/host'
+  #     - '--collector.tcpstat'
+  #   restart: on-failure
+  #   network_mode: 'host'
+  #   pid: 'host'
+  #   volumes:
+  #     - /:/host:ro,rslave
+
+  jaeger-agent:
+    image: jaegertracing/jaeger-agent:1.18.1
+    container_name: muta_jaeger_agent
+    command:
+        # 这里将 jaeger-collector_ip 改成 jaeger-collector 部署节点的 ip 
+      - '--reporter.grpc.host-port=192.168.31.195:14250'
+    ports:
+      - '14271:14271'
+      - '5775:5775/udp'
+      - '6831:6831/udp'
+      - '6832:6832/udp'
+      - '5778:5778'
+    restart: on-failure
+
+  promtail:
+    image: grafana/promtail:master-9ad98df
+    container_name: muta_promtail
+    restart: on-failure
+    volumes:
+      - ./data/promtail/positions:/tmp/promtail/
+      - ./config/promtail/promtail-config.yaml:/etc/promtail/promtail-config.yaml
+      # 这边挂载到 muta 打日志的目录
+      - ./logs/promtail:/var/logs
+    command: 
+      -config.file=/etc/promtail/promtail-config.yaml
+
