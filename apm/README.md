@@ -1,4 +1,4 @@
-[toc]
+
 # muta monitor 部署
 
 ## 工程目录结构
@@ -299,9 +299,9 @@ monitor 的 config 较多，以下按顺序描述每个目录的功能和文件�
 
 ##### dashboards
 ###### muta-benchmark.json
-模板文件太长，影响阅读，单独发送
+模板文件太长，请查看对应目录
 ###### muta-node.json
-模板文件太长，影响阅读，单独发送
+模板文件太长，请查看对应目录
 
 ##### provisioning
 ###### dashboards
