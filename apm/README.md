@@ -1,4 +1,30 @@
 
+<!-- TOC -->
+
+- [muta monitor 部署](#muta-monitor-部署)
+    - [工程目录结构](#工程目录结构)
+    - [Agent 详解](#agent-详解)
+        - [主要 agent 如下:](#主要-agent-如下)
+        - [agent 目录](#agent-目录)
+        - [docker-compose.yml](#docker-composeyml)
+        - [.env](#env)
+        - [config 目录](#config-目录)
+    - [Monitor 详解](#monitor-详解)
+        - [主要服务如下:](#主要服务如下)
+        - [monitor 目录](#monitor-目录)
+        - [docker-compose.yml](#docker-composeyml-1)
+        - [config 目录](#config-目录-1)
+            - [grafana](#grafana)
+            - [loki](#loki)
+                - [loki-local-config.yaml](#loki-local-configyaml)
+            - [promethues](#promethues)
+                - [prometheus.yml](#prometheusyml)
+    - [部署步骤](#部署步骤)
+        - [monitor](#monitor)
+        - [agent](#agent)
+
+<!-- /TOC -->
+
 # muta monitor 部署
 
 ## 工程目录结构
@@ -125,7 +151,7 @@ scrape_configs:
 
 ### 主要服务如下:
 
-| 服务名 | 功能 |  |
+| 服务名 | 功能 | 参考 |
 | --- | --- | --- |
 | grafana | dashboard，监控，日志查看，告警配置 | [grafana](https://grafana.com/docs/grafana/latest/)
  |
@@ -274,17 +300,23 @@ scrape_configs:
 
 ## 部署步骤
 ### monitor 
-copy monitor 目录到指定机器上, 按照上述 monitor 详解文档描述修改以下两个文件
+copy monitor 目录到指定机器上
+```shell
+$ git clone https://github.com/nervosnetwork/muta-devops
+$ cd muta-devops/apm/monitor
+```
+
+按照上述 monitor 详解文档描述修改以下两个文件
 - prometheus.yml
 - loki-local-config.yaml
 
 之后使用 docker 启动服务
 ```shell
-docker-compose up -d 
+$ docker-compose up -d 
 ```
 使用 docker-compose 命令查看服务是否启动
 ```shell
-docker-compose ps
+$ docker-compose ps
 ```
 所有服务都为 up 状态时, 访问浏览器查看对应监控平台
 
@@ -300,9 +332,13 @@ http://jarger_ip:16686
 
 ### agent 
 
-copy agent 目录到 muta 节点上, 修改 .env.example 为 .env 
+copy agent 目录到 muta 节点上 
+```shell
+$ git clone https://github.com/nervosnetwork/muta-devops
+$ cd muta-devops/apm/agent
+```
 
-按照上述 agent 详解文档描述修改以下两个文件
+修改 .env.example 为 .env, 并按照上述 agent 详解文档描述修改以下两个文件
 
 - .env
 - promtail-config.yaml
@@ -310,11 +346,11 @@ copy agent 目录到 muta 节点上, 修改 .env.example 为 .env
 
 之后使用 docker 启动服务
 ```shell
-docker-compose up -d 
+$ docker-compose up -d 
 ```
 使用 docker-compose 命令查看服务是否启动
 ```shell
-docker-compose ps
+$ docker-compose ps
 ```
 所有服务都为 up 状态时, 访问浏览器可以查看对应监控指标
 
