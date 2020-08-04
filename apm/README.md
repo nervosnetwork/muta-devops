@@ -91,11 +91,11 @@ services:
     image: jaegertracing/jaeger-agent:1.18.1
     container_name: muta_jaeger_agent
     command:
-      - '--reporter.grpc.host-port=${JACGER_COLLECTOR_IP}'
+      - '--reporter.grpc.host-port=${JAEGER_COLLECTOR_IP}'
     ports:
       - '14271:14271'
       - '5775:5775/udp'
-      - '${JACGER_AGENT_PORT}:6831/udp'
+      - '${JAEGER_AGENT_PORT}:6831/udp'
       - '6832:6832/udp'
       - '5778:5778'
     restart: on-failure
