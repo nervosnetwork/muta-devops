@@ -39,5 +39,5 @@ scrape_configs:
   # 这里配置所有 muta 节点， ['node_id_1:8000', 'node_ip_2:8000', 'node_ip_3:8000']
   - job_name: 'muta_exporter'
     static_configs:
-    - targets: ['192.168.31.195:8000']
+    - targets: ['192.168.20.211:8000']
 

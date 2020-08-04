@@ -6,6 +6,7 @@
 muta-monitor
 |
 |___ agent
+|    |___ .env
 |    |___ docker-compose.yml
 |    |___ config
 |          |___ promtail
@@ -35,21 +36,31 @@ muta-monitor
 ```
 
 其中 agent 主要跟随 muta 部署，负责采集信息
+
 monitor 需要一台机器部署，主要运行目前的监控服务
 
 
 ## Agent 详解
-主要 agent 如下:
+agent 主要跟随 muta 部署，主要用于采集 muta 的监控指标
+
+### 主要 agent 如下:
 
 | agent | 功能 |
 | --- | --- |
-| aode-exporter | 采集机器信息(cpu, 内存等) |
+| node-exporter | 采集机器信息(cpu, 内存等) |
 | jaeger-agent | tracing |
 | promtail-agent | 采集日志 |
+
+[node-exporter](https://github.com/prometheus/node_exporter)
+
+[jaeger-agent](https://www.jaegertracing.io/docs/1.16/getting-started/#all-in-one)
+
+[promtail-agent](https://grafana.com/docs/loki/latest/clients/promtail/)
 
 ### agent 目录
 ```
 |___ agent
+     |___ .env
      |___ docker-compose.yml
      |___ config
            |___ promtail
@@ -58,7 +69,9 @@ monitor 需要一台机器部署，主要运行目前的监控服务
 ```
 
 
+
 ### docker-compose.yml
+muta node 采集端程序
 ```yml
 version: '3'
 services:
@@ -78,12 +91,11 @@ services:
     image: jaegertracing/jaeger-agent:1.18.1
     container_name: muta_jaeger_agent
     command:
-        # 这里将 jaeger-collector_ip 改成 jaeger-collector 部署节点的 ip 
-      - '--reporter.grpc.host-port=jaeger-collector_ip:14250'
+      - '--reporter.grpc.host-port=${JACGER_COLLECTOR_IP}'
     ports:
       - '14271:14271'
       - '5775:5775/udp'
-      - '6831:6831/udp'
+      - '${JACGER_AGENT_PORT}:6831/udp'
       - '6832:6832/udp'
       - '5778:5778'
     restart: on-failure
@@ -95,15 +107,26 @@ services:
     volumes:
       - ./data/promtail/positions:/tmp/promtail/
       - ./config/promtail/promtail-config.yaml:/etc/promtail/promtail-config.yaml
-      # 这边挂载到 muta 打日志的目录
-      - ./logs/promtail:/var/logs
+      - ${MUTA_LOG_PATH}:/var/logs
     command: 
       -config.file=/etc/promtail/promtail-config.yaml
-
-
 ```
-**一定挂载到 muta 打日志的目录**
 
+### .env
+用于配置采集端的 docker-compose 环境变量
+```env
+# 该配置用于给 jaeger server push 数据
+# 配置为 jaeger-collector 的 ip port
+JACGER_COLLECTOR_IP=192.168.20.211:14250
+
+# 该配置用于和 muta 交互
+# 配置为 muta chain.toml 配置下 [apm] tracing_address 参数
+JACGER_AGENT_PORT=6831
+
+# 该配置用于给 promtail 采集日志用
+# 配置为 muta 的日志输出目录
+MUTA_LOG_PATH=muta/logs/promtail
+```
 
 
 ### config 目录
@@ -120,7 +143,7 @@ positions:
   sync_period: 10s 
 
 clients:
-  # Loki 的 server 地址，这边 ip 为 server_ip, port 对应 server docker-compose 暴露的端口， 默认3100
+  # Loki 的 server 地址, port 对应 docker-compose 中暴露的端口，默认3100
   - url: http://loki-server:3100/api/prom/push
 
 scrape_configs:
@@ -140,14 +163,25 @@ scrape_configs:
 
 ## Monitor 详解
 目前 muta 测试环境使用 docker-compose 的方式部署 monitor
-主要服务如下:
+
+### 主要服务如下:
 
 | 服务名 | 功能 |
 | --- | --- |
-| Grafana | dashboard，监控，日志查看，告警配置 |
-| Promethues | metric 存储 |
-| Loki | 日志存储 |
-| Jaeger | tracing 存储 |
+| grafana | dashboard，监控，日志查看，告警配置 |
+| promethues | metric 存储 |
+| loki | 日志存储 |
+| jaeger | tracing 存储 |
+
+[grafana](https://grafana.com/docs/grafana/latest/)
+
+[promethues](https://prometheus.io/docs/introduction/overview/)
+
+[loki](https://grafana.com/docs/loki/latest/configuration/)
+
+[jaeger](https://github.com/jaegertracing/jaeger)
+
+
 
 ### monitor 目录
 ```
@@ -297,46 +331,9 @@ monitor 的 config 较多，以下按顺序描述每个目录的功能和文件�
 1. dashboards 放置 dashboard 模板
 2. provisioning 初始化数据源和指定初始化 dashboard 的配置
 
-##### dashboards
-###### muta-benchmark.json
-模板文件太长，请查看对应目录
-###### muta-node.json
-模板文件太长，请查看对应目录
+grafana 的配置目前主要是数据源和 dashboard 的配置文件，由于配置基本是固定的并不需要修改，直接使用即可
 
-##### provisioning
-###### dashboards
-配置 dashboards.yaml
-```yaml
-## config file version
-apiVersion: 1
 
-providers:
-- name: 'default'
-  orgId: 1
-  folder: ''
-  type: file
-  options:
-    path: /var/lib/grafana/dashboards
-
-```
-###### datasources
-datasources.yaml
-```yaml
-
-apiVersion: 1
-datasources:
-- name: Prometheus
-  type: prometheus
-  access: proxy
-  url: http://prometheus:9090
-  basicAuth: false
-- name: Loki
-  type: loki
-  access: proxy
-  url: http://muta-loki:3100
-  basicAuth: false
-
-```
 
 #### loki
 ##### loki-local-config.yaml
@@ -387,7 +384,7 @@ limits_config:
 
 #### promethues
 ##### prometheus.yml
-该文件主要是 Promethues 的运行配置，里面 job 部分为拉取配置
+该文件主要是 promethues 的运行配置，里面 job 部分为拉取配置
 ```yaml
 # my global config
 global:
@@ -423,11 +420,13 @@ scrape_configs:
     - targets: ['muta-jaeger-collector:14269','muta-jaeger-query:16687']
 
   # 这里配置所有 muta 节点， ['node_id_1:9100, 'node_ip_2:9100', 'node_ip_3:9100']
+  # node_exporter 的默认端点就是 9100
   - job_name: 'node_exporter'
     static_configs:
     - targets: [node_exporter_ip]
   
   # 这里配置所有 muta 节点， ['node_id_1:8000', 'node_ip_2:8000', 'node_ip_3:8000']
+  # 端口请查看 muta chain.toml 配置下 [graphql] listening_address 参数
   - job_name: 'muta_exporter'
     static_configs:
     - targets: ['muta_exporter_ip']
