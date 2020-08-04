@@ -6,7 +6,7 @@
 muta-monitor
 |
 |___ agent
-|    |___ .env
+|    |___ .env.example
 |    |___ docker-compose.yml
 |    |___ config
 |          |___ promtail
@@ -45,22 +45,16 @@ agent 主要跟随 muta 部署，主要用于采集 muta 的监控指标
 
 ### 主要 agent 如下:
 
-| agent | 功能 |
-| --- | --- |
-| node-exporter | 采集机器信息(cpu, 内存等) |
-| jaeger-agent | tracing |
-| promtail-agent | 采集日志 |
-
-[node-exporter](https://github.com/prometheus/node_exporter)
-
-[jaeger-agent](https://www.jaegertracing.io/docs/1.16/getting-started/#all-in-one)
-
-[promtail-agent](https://grafana.com/docs/loki/latest/clients/promtail/)
+| agent | 功能 | 参考 |
+| --- | --- | --- |
+| node-exporter | 采集机器信息(cpu, 内存等) | [node-exporter](https://github.com/prometheus/node_exporter) |
+| jaeger-agent | tracing | [jaeger-agent](https://www.jaegertracing.io/docs/1.16/getting-started/#all-in-one) |
+| promtail-agent | 采集日志 | [promtail-agent](https://grafana.com/docs/loki/latest/clients/promtail/) |
 
 ### agent 目录
 ```
 |___ agent
-     |___ .env
+     |___ .env.example
      |___ docker-compose.yml
      |___ config
            |___ promtail
@@ -71,66 +65,31 @@ agent 主要跟随 muta 部署，主要用于采集 muta 的监控指标
 
 
 ### docker-compose.yml
-muta node 采集端程序
-```yml
-version: '3'
-services:
-  node-exporter:
-    image: quay.io/prometheus/node-exporter:v0.18.1
-    container_name: muta_node_exporter
-    command:
-      - '--path.rootfs=/host'
-      - '--collector.tcpstat'
-    restart: on-failure
-    network_mode: 'host'
-    pid: 'host'
-    volumes:
-      - /:/host:ro,rslave
-
-  jaeger-agent:
-    image: jaegertracing/jaeger-agent:1.18.1
-    container_name: muta_jaeger_agent
-    command:
-      - '--reporter.grpc.host-port=${JAEGER_COLLECTOR_IP}'
-    ports:
-      - '14271:14271'
-      - '5775:5775/udp'
-      - '${JAEGER_AGENT_PORT}:6831/udp'
-      - '6832:6832/udp'
-      - '5778:5778'
-    restart: on-failure
-
-  promtail:
-    image: grafana/promtail:master-9ad98df
-    container_name: muta_promtail
-    restart: on-failure
-    volumes:
-      - ./data/promtail/positions:/tmp/promtail/
-      - ./config/promtail/promtail-config.yaml:/etc/promtail/promtail-config.yaml
-      - ${MUTA_LOG_PATH}:/var/logs
-    command: 
-      -config.file=/etc/promtail/promtail-config.yaml
-```
+muta node 采集端程序, 内部配置在 .env.example
 
 ### .env
 用于配置采集端的 docker-compose 环境变量
+
 ```env
 # 该配置用于给 jaeger server push 数据
 # 配置为 jaeger-collector 的 ip port
-JACGER_COLLECTOR_IP=192.168.20.211:14250
+# 对应 monitor docker-compose 中的 jaeger-collector 服务
+JACGER_COLLECTOR_IP=jaeger-collector:14250
 
 # 该配置用于和 muta 交互
-# 配置为 muta chain.toml 配置下 [apm] tracing_address 参数
+# 配置文件地址: https://github.com/nervosnetwork/muta/blob/master/devtools/chain/config.toml
+# 关联 [apm] tracing_address 参数
 JACGER_AGENT_PORT=6831
 
 # 该配置用于给 promtail 采集日志用
-# 配置为 muta 的日志输出目录
-MUTA_LOG_PATH=muta/logs/promtail
+# 配置文件地址: https://github.com/nervosnetwork/muta/blob/master/devtools/chain/config.toml
+# 关联 [logger] log_path 参数
+MUTA_LOG_PATH=muta/logs
 ```
 
 
 ### config 目录
-该目录主要存放 Agent 的配置，目前测试环境的版本比较简单，只需要配置 promtail 的配置文件即可
+该目录主要存放 agent 的配置，目前测试环境的版本比较简单，只需要配置 promtail 的配置文件 promtail-config.yaml 即可
 ```yml
 server:
   http_listen_port: 9080
@@ -166,21 +125,14 @@ scrape_configs:
 
 ### 主要服务如下:
 
-| 服务名 | 功能 |
-| --- | --- |
-| grafana | dashboard，监控，日志查看，告警配置 |
-| promethues | metric 存储 |
-| loki | 日志存储 |
-| jaeger | tracing 存储 |
-
-[grafana](https://grafana.com/docs/grafana/latest/)
-
-[promethues](https://prometheus.io/docs/introduction/overview/)
-
-[loki](https://grafana.com/docs/loki/latest/configuration/)
-
-[jaeger](https://github.com/jaegertracing/jaeger)
-
+| 服务名 | 功能 |  |
+| --- | --- | --- |
+| grafana | dashboard，监控，日志查看，告警配置 | [grafana](https://grafana.com/docs/grafana/latest/)
+ |
+| promethues | metric 存储 | [promethues](https://prometheus.io/docs/introduction/overview/) |
+| loki | 日志存储 | [loki](https://grafana.com/docs/loki/latest/configuration/) |
+| jaeger | tracing 存储 | [jaeger](https://github.com/jaegertracing/jaeger)
+ |
 
 
 ### monitor 目录
@@ -206,123 +158,7 @@ scrape_configs:
                |___ prometheus.yml
 ```
 ### docker-compose.yml
-```yml
-version: "3"
-
-services:
-
-  # ================================= Grafana  ================================= 
-  grafana:
-    image: grafana/grafana:master
-    container_name: muta-granafa
-    restart: on-failure
-    ports:
-      - "3000:3000"
-    volumes:
-      - "./config/grafana/dashboards:/var/lib/grafana/dashboards"
-      - "./config/grafana/provisioning:/etc/grafana/provisioning"
-      - "./data/grafana/log:/var/log/grafana"
-    environment:
-      GF_EXPLORE_ENABLED: "true"
-    networks:
-      - muta-monitor     
-
-  # ================================= Prometheus ================================= 
-  prometheus:
-    image: prom/prometheus
-    container_name: muta-prometheus
-    hostname: prometheus
-    restart: on-failure
-    volumes:
-      - ./config/promethues/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./data/prometheus:/prometheus
-    ports:
-      - "9090:9090"
-    command:
-      - --config.file=/etc/prometheus/prometheus.yml
-      - --storage.tsdb.path=/prometheus
-      - --web.console.libraries=/usr/share/prometheus/console_libraries
-      - --web.console.templates=/usr/share/prometheus/consoles
-      - --web.enable-lifecycle
-    networks:
-      - muta-monitor   
-
-  # ================================= Jaeger  ================================= 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
-    container_name: muta-elasticsearch
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-    restart: on-failure
-    environment:
-      - cluster.name=jaeger-cluster
-      - discovery.type=single-node
-      - http.host=0.0.0.0
-      - transport.host=127.0.0.1
-      - ES_JAVA_OPTS=-Xms8192m -Xmx8192m
-      - xpack.security.enabled=false
-    volumes:
-      - ./data/elasticsearch/data:/usr/share/elasticsearch/data
-    networks:
-      - muta-monitor   
-
-  jaeger-collector:
-    image: jaegertracing/jaeger-collector:1.18.1
-    container_name: muta-jaeger-collector
-    ports:
-      - "14269:14269"
-      - "14268:14268"
-      - "14250:14250"
-      - "9411:9411"
-    restart: on-failure
-    environment:
-      - SPAN_STORAGE_TYPE=elasticsearch
-    command: [
-      "--es.server-urls=http://elasticsearch:9200",
-      "--es.num-shards=1",
-      "--es.num-replicas=0",
-      "--log-level=error"
-    ]
-    depends_on:
-      - elasticsearch
-    networks:
-      - muta-monitor   
-
-  jaeger-query:
-    image: jaegertracing/jaeger-query:1.18.1
-    container_name: muta-jaeger-query
-    environment:
-      - SPAN_STORAGE_TYPE=elasticsearch
-      - no_proxy=localhost
-    ports:
-      - "16686:16686"
-      - "16687:16687"
-    restart: on-failure
-    command: [
-      "--es.server-urls=http://elasticsearch:9200",
-      "--span-storage.type=elasticsearch",
-      "--log-level=debug"
-    ]
-    depends_on:
-      - jaeger-collector  
-    networks:
-      - muta-monitor   
-
-  # ================================= Loki  ================================= 
-  loki:
-    image: grafana/loki:1.5.0
-    container_name: muta-loki
-    restart: on-failure
-    ports:
-      - "3100:3100"
-    volumes:
-      - ./config/loki:/etc/loki
-      - ./data/nginx:/var/log/nginx
-    command: -config.file=/etc/loki/loki-local-config.yaml
-    networks:
-      - muta-monitor   
-```
+monitor 所使用的组件, 可以直接使用
 
 ### config 目录
 monitor 的 config 较多，以下按顺序描述每个目录的功能和文件内容
@@ -357,6 +193,8 @@ ingester:
 
 schema_config:
   configs:
+  # 指定一个过去的日期, 该参数和存储的 index buckets 有关
+  # 具体参考 https://grafana.com/docs/loki/latest/configuration/#schema_config 下的 [from: <daytime>]
   - from: 2020-05-15
     store: boltdb
     object_store: filesystem
@@ -434,10 +272,22 @@ scrape_configs:
 
 ```
 
-## 运行
-参照 docker-compose 命令即可
+## 部署步骤
+### monitor 
+copy monitor 目录到指定机器上, 按照上述 monitor 详解文档描述修改以下两个文件
+- prometheus.yml
+- loki-local-config.yaml
 
-### 地址
+之后使用 docker 启动服务
+```shell
+docker-compose up -d 
+```
+使用 docker-compose 命令查看服务是否启动
+```shell
+docker-compose ps
+```
+所有服务都为 up 状态时, 访问浏览器查看对应监控平台
+
 grafana
 ```http
 http://grafana_ip:3000
@@ -447,3 +297,24 @@ jaeger 地址
 ```http
 http://jarger_ip:16686
 ```
+
+### agent 
+
+copy agent 目录到 muta 节点上, 修改 .env.example 为 .env 
+
+按照上述 agent 详解文档描述修改以下两个文件
+
+- .env
+- promtail-config.yaml
+
+
+之后使用 docker 启动服务
+```shell
+docker-compose up -d 
+```
+使用 docker-compose 命令查看服务是否启动
+```shell
+docker-compose ps
+```
+所有服务都为 up 状态时, 访问浏览器可以查看对应监控指标
+

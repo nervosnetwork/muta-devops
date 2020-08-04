@@ -1,16 +1,16 @@
 version: '3'
 services:
-  # node-exporter:
-  #   image: quay.io/prometheus/node-exporter:v0.18.1
-  #   container_name: muta_node_exporter
-  #   command:
-  #     - '--path.rootfs=/host'
-  #     - '--collector.tcpstat'
-  #   restart: on-failure
-  #   network_mode: 'host'
-  #   pid: 'host'
-  #   volumes:
-  #     - /:/host:ro,rslave
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:v0.18.1
+    container_name: muta_node_exporter
+    command:
+      - '--path.rootfs=/host'
+      - '--collector.tcpstat'
+    restart: on-failure
+    network_mode: 'host'
+    pid: 'host'
+    volumes:
+      - /:/host:ro,rslave
 
   jaeger-agent:
     image: jaegertracing/jaeger-agent:1.18.1

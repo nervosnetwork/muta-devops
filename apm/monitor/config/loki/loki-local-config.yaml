@@ -16,6 +16,8 @@ ingester:
 
 schema_config:
   configs:
+  # 指定一个过去的日期, 该参数和存储的 index buckets 有关
+  # 具体参考 https://grafana.com/docs/loki/latest/configuration/#schema_config 下的 [from: <daytime>]
   - from: 2020-05-15
     store: boltdb
     object_store: filesystem
