@@ -2,26 +2,26 @@
 <!-- TOC -->
 
 - [muta monitor 部署](#muta-monitor-部署)
-    - [工程目录结构](#工程目录结构)
-    - [Agent 详解](#agent-详解)
-        - [主要 agent 如下:](#主要-agent-如下)
-        - [agent 目录](#agent-目录)
-        - [docker-compose.yml](#docker-composeyml)
-        - [.env](#env)
-        - [config 目录](#config-目录)
-    - [Monitor 详解](#monitor-详解)
-        - [主要服务如下:](#主要服务如下)
-        - [monitor 目录](#monitor-目录)
-        - [docker-compose.yml](#docker-composeyml-1)
-        - [config 目录](#config-目录-1)
-            - [grafana](#grafana)
-            - [loki](#loki)
-                - [loki-local-config.yaml](#loki-local-configyaml)
-            - [promethues](#promethues)
-                - [prometheus.yml](#prometheusyml)
-    - [部署步骤](#部署步骤)
-        - [monitor](#monitor)
-        - [agent](#agent)
+  - [工程目录结构](#工程目录结构)
+  - [Agent 详解](#agent-详解)
+    - [主要 agent 如下:](#主要-agent-如下)
+    - [agent 目录](#agent-目录)
+    - [docker-compose.yml](#docker-composeyml)
+    - [.env](#env)
+    - [config 目录](#config-目录)
+  - [Monitor 详解](#monitor-详解)
+    - [主要服务如下:](#主要服务如下)
+    - [monitor 目录](#monitor-目录)
+    - [docker-compose.yml](#docker-composeyml-1)
+    - [config 目录](#config-目录-1)
+      - [grafana](#grafana)
+      - [loki](#loki)
+        - [loki-local-config.yaml](#loki-local-configyaml)
+      - [promethues](#promethues)
+        - [prometheus.yml](#prometheusyml)
+  - [部署步骤](#部署步骤)
+    - [monitor](#monitor)
+    - [agent](#agent)
 
 <!-- /TOC -->
 
@@ -153,12 +153,10 @@ scrape_configs:
 
 | 服务名 | 功能 | 参考 |
 | --- | --- | --- |
-| grafana | dashboard，监控，日志查看，告警配置 | [grafana](https://grafana.com/docs/grafana/latest/)
- |
+| grafana | dashboard，监控，日志查看，告警配置 | [grafana](https://grafana.com/docs/grafana/latest/) |
 | promethues | metric 存储 | [promethues](https://prometheus.io/docs/introduction/overview/) |
 | loki | 日志存储 | [loki](https://grafana.com/docs/loki/latest/configuration/) |
-| jaeger | tracing 存储 | [jaeger](https://github.com/jaegertracing/jaeger)
- |
+| jaeger | tracing 存储 | [jaeger](https://github.com/jaegertracing/jaeger) |
 
 
 ### monitor 目录
