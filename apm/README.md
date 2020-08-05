@@ -2,6 +2,7 @@
 <!-- TOC -->
 
 - [muta monitor 部署](#muta-monitor-部署)
+  - [架构](#架构)
   - [工程目录结构](#工程目录结构)
   - [Agent 详解](#agent-详解)
     - [主要 agent 如下:](#主要-agent-如下)
@@ -26,6 +27,9 @@
 <!-- /TOC -->
 
 # muta monitor 部署
+
+## 架构
+![](./asset/架构.jpg)
 
 ## 工程目录结构
 ```
