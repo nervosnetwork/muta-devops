@@ -211,7 +211,7 @@ monitor 的 config 较多，以下按顺序描述每个目录的功能和文件�
 dashboard 的配置基本是固定的并不需要修改，直接使用即可
 
 ##### provisioning
-dashboards 和 datasources 目录无序修改
+dashboards 和 datasources 目录无需修改，
 notifiers 目录下的 notifiers.yaml 文件用于配置告警信息推送
 ```yaml
 apiVersion: 1
