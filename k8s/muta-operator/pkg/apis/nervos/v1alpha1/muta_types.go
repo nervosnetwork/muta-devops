@@ -73,6 +73,7 @@ type NodeCrypto struct {
 
 type KeyPair struct {
 	Privkey   string `json:"private_key"`
+	PeerID    string `json:"peer_id"`
 	Pubkey    string `json:"public_key"`
 	BlsPubkey string `json:"bls_public_key"`
 	Address   string `json:"address"`
@@ -139,7 +140,7 @@ type ConfigNetwork struct {
 }
 
 type ConfigNetworkBootstrap struct {
-	Pubkey  string `json:"pubkey" toml:"pubkey"`
+	PeerID  string `json:"peer_id" toml:"peer_id"`
 	Address string `json:"address" toml:"address"`
 }
 

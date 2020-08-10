@@ -1,7 +1,5 @@
-const path = require('path');
 const k8s = require('@kubernetes/client-node');
 const { Muta } = require("@mutadev/muta-sdk");
-const shell = require('shelljs');
 const timestring = require('timestring')
 
 const WATCH_DURATION = process.env.WATCH_DURATION ? process.env.WATCH_DURATION : "3h";
@@ -10,9 +8,6 @@ const APP_NAME = process.env.APP_NAME;
 const APP_PORT = process.env.APP_PORT ? process.env.APP_PORT : '8080';
 const APP_GRAPHQL_URL = process.env.APP_GRAPHQL_URL ? process.env.APP_GRAPHQL_URL : 'graphql';
 const APP_CHAIN_ID = process.env.APP_CHAIN_ID ? process.env.APP_CHAIN_ID : "0xb6a4d7da21443f5e816e8700eea87610e6d769657d6b8ec73028457bf2ca4036";
-const JOB_BENCHMARK_DURATION = process.env.JOB_BENCHMARK_DURATION ? process.env.JOB_BENCHMARK_DURATION : "300";
-const JOB_BENCHMARK_TIMEOUT_GAP = process.env.JOB_BENCHMARK_TIMEOUT_GAP ? process.env.JOB_BENCHMARK_TIMEOUT_GAP : "20";
-const JOB_BENCHMARK_CPU = process.env.JOB_BENCHMARK_CPU ? process.env.JOB_BENCHMARK_CPU : "4";
 
 const kc = new k8s.KubeConfig();
 kc.loadFromDefault();
@@ -32,10 +27,6 @@ async function run() {
 
     console.log(`all node endpoints:\n${nodeEndpoints.join("\n")}`);
 
-    runJob(nodeEndpoints, JOB_BENCHMARK_DURATION, JOB_BENCHMARK_TIMEOUT_GAP, APP_CHAIN_ID, JOB_BENCHMARK_CPU).catch(e => {
-        console.error(`[job] ${e}`);
-        process.exit(1);
-    });
     runCheckStatus(nodeEndpoints).catch(e => {
         console.error(`[check status] ${e}`);
         process.exit(1);
@@ -55,29 +46,6 @@ async function getNodeEndPoints(ns, appName, graphql, appPort) {
 
     const nodeEndpoints = services.map(service => `http://${service.metadata.name}.${ns}:${appPort}/${graphql}`);
     return nodeEndpoints;
-}
-
-async function runJob(nodeEndpoints, duration, gap, chainID, cpu) {
-    const benchJobPath = path.join(__dirname, "node_modules/.bin/muta-bench");
-    console.log(`[job:benchmark] bin path ${benchJobPath}`);
-
-    while (true) {
-        // run benchmark
-        const command = `node ${benchJobPath} -d ${duration} -c ${nodeEndpoints.length * 3} --gap ${gap} --chain-id ${chainID} --cpu ${cpu} ${nodeEndpoints.join(" ")}`;
-        console.log(`[job:benchmark] start ${command}`);
-        await new Promise((resolve) => {
-            const cp = shell.exec(command, { async: true });
-
-            cp.on("message", console.log);
-            cp.on('close', (code, signal) => {
-                console.log(`[job:benchmark] benchmark job close. code ${code} signal ${signal}`);
-                resolve()
-            })
-        });
-
-        console.log(`[job:benchmark] success`);
-        await sleep(1000 * 10); // sleep 10s
-    }
 }
 
 async function runCheckStatus(nodeEndpoints) {
@@ -113,7 +81,7 @@ function sleep(ms) {
 }
 
 async function retryGetHeight(clients) {
-    const iter = Array.from({ length: 10 }).map((_ele, i) => i);
+    const iter = Array.from({ length: 60 }).map((_ele, i) => i);
 
     for (const counter of iter) {
         try {
@@ -127,7 +95,7 @@ async function retryGetHeight(clients) {
                 throw err;
             }
 
-            await sleep(1000 * 5); // sleep 5s
+            await sleep(1000 * 10); // sleep 10s
         }
     }
 }
