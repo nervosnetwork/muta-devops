@@ -1,3 +1,4 @@
+
 # muta monitor ha 部署
 该文档用于说明 muta monitor 组件的高可用部署方式
 - Grafana
@@ -6,7 +7,7 @@
 - jaeger
 
 ## Grafana
-[How to setup Grafana for high availability](https://grafana.com/docs/grafana/latest/tutorials/ha_setup/)
+[官文推荐的高可用部署方式](https://grafana.com/docs/grafana/latest/tutorials/ha_setup/)
 
 
 ## Promethues
@@ -24,3 +25,21 @@ Promethues 的高可用主要通过以下两个方面解决
 ### 逻辑结构
 ![](./asset/ha-promethues.png)
 
+
+## Loki
+Loki 的高可用通过以下三个方面解决
+- 一致性哈希
+- 数据持久化
+- 负载均衡
+
+
+### 组件列表
+| 组件名 | 参考链接 | 说明 |
+| --- | --- | --- |
+| loki | - | - |
+| etcd | [官方一致性哈希配置](https://grafana.com/docs/loki/latest/configuration/) | 存储一致性哈希，可根据官方文档替换 |
+| cassandra | [官方持久化配置参考](https://grafana.com/docs/loki/latest/storage/) | 可根据官方文档替换 |
+| nginx | - | 用于处理集群后的请求分发 |
+
+### 逻辑结构
+![](./asset/ha-loki.png)
