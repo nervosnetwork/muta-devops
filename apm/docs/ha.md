@@ -73,7 +73,7 @@ Loki 的架构中比较重要的部分:
 
 
 ### 生产部署建议
-Loki 使用一致性哈希来保证数据流和 Ingester 的一致性，他们共同在一个哈希环上，哈希环的信息可以存放到etcd、Consul或者内存中 当使用 Etcd 或 Consul 作为哈希环的实现时，所有 Ingester 通过一组token注册到环中，每个 token 是一个随机的 32-bit 无符号整数，同时 Ingester 会上报其状态到哈希环中。由于所有的Distributor 使用相同的hash环，写请求可以发送至任意节点
+Loki 使用一致性哈希来保证数据流和 Ingester 的一致性，他们共同在一个哈希环上，哈希环的信息可以存放到Etcd、Consul或者内存中 当使用 Etcd 或 Consul 作为哈希环的实现时，所有 Ingester 通过一组 Token 注册到环中，每个 Token 是一个随机的 32-bit 无符号整数，同时 Ingester 会上报其状态到哈希环中。由于所有的 Distributor 使用相同的 Hash 环，写请求可以发送至任意节点
 
 在Loki 中，Ring用于 Ingester 和 Distributor 的服务注册和发现， Ring 的实现使用了键值存储
 
@@ -102,7 +102,7 @@ Loki 使用一致性哈希来保证数据流和 Ingester 的一致性，他们�
 ### 架构分析
 Jaeger 架构
 ![](./asset/jaeger.png)
-Jaeger 主要由几个组件组成
+Jaeger 主要由组件:
 - jaeger-agent: 接收 jaeger-client 的数据，并上报给 jaeger-collector
 - jaeger-collector: 处理 jaeger-agent 上报的数据，做持久化操作
 - jaeger-query: 处理查询相关的逻辑      
@@ -110,7 +110,7 @@ Jaeger 主要由几个组件组成
 
 
 ### 生产部署建议
-Jaeger 各组件之间可以独立存在，通过 RPC 通信，所生产环境建议部署多个 jaeger-collector 做采集节点的高可用
+Jaeger 各组件之间可以独立存在，通过 RPC 通信，所以生产环境建议部署多个 jaeger-collector 做采集节点的高可用
 
 jaeger-query 建议也部署多个节点，并在前面增加个 nginx 做查询的高可用
 
