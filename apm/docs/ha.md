@@ -40,6 +40,22 @@ Loki 的高可用通过以下三个方面解决
 | etcd | [官方一致性哈希配置](https://grafana.com/docs/loki/latest/configuration/) | 存储一致性哈希，可根据官方文档替换 |
 | cassandra | [官方持久化配置参考](https://grafana.com/docs/loki/latest/storage/) | 可根据官方文档替换 |
 | nginx | - | 用于处理集群后的请求分发 |
+| promtail | - | log 采集，可根据官方文档替换，跟随应用部署 |
 
 ### 逻辑结构
 ![](./asset/ha-loki.png)
+
+
+
+## Jaeger
+
+| 组件名 | 参考链接 | 说明 |
+| --- | --- | --- |
+| elasticsearch | [elasticsearch docs](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html) | 用于存储数据，可根据官方文档替换 |
+| jaeger-collector | [官方配置文档](https://www.jaegertracing.io/docs/1.18/cli/) | 用于接收 agent push 的数据 |
+| jaeger-query | 同上 | 用于查询数据 |
+| jaeger-agent | 同上 | 用于与 client 交互，跟随应用部署 |
+
+
+### 逻辑结构
+![](./asset/ha-jaeger.png)
