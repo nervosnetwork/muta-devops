@@ -103,25 +103,27 @@ type ConfigService struct {
 }
 
 type ConfigMetadata struct {
-	ChainID        string           `json:"chain_id"`
-	CommonRef      string           `json:"common_ref"`
-	TimeoutGap     uint64           `json:"timeout_gap"`
-	CyclesLimit    uint64           `json:"cycles_limit"`
-	CyclesPrice    uint64           `json:"cycles_price"`
-	Interval       uint64           `json:"interval"`
-	VerifierList   []ConfigVerifier `json:"verifier_list"`
-	ProposeRatio   uint64           `json:"propose_ratio"`
-	PrevoteRatio   uint64           `json:"prevote_ratio"`
-	PrecommitRatio uint64           `json:"precommit_ratio"`
-	BrakeRatio     uint64           `json:"brake_ratio"`
-	TxNumLimit     uint64           `json:"tx_num_limit"`
-	MaxTxSize      uint64           `json:"max_tx_size"`
+	ChainID          string           `json:"chain_id"`
+	Bech32AddressHrp string           `json:"bech32_address_hrp"`
+	CommonRef        string           `json:"common_ref"`
+	TimeoutGap       uint64           `json:"timeout_gap"`
+	CyclesLimit      uint64           `json:"cycles_limit"`
+	CyclesPrice      uint64           `json:"cycles_price"`
+	Interval         uint64           `json:"interval"`
+	VerifierList     []ConfigVerifier `json:"verifier_list"`
+	ProposeRatio     uint64           `json:"propose_ratio"`
+	PrevoteRatio     uint64           `json:"prevote_ratio"`
+	PrecommitRatio   uint64           `json:"precommit_ratio"`
+	BrakeRatio       uint64           `json:"brake_ratio"`
+	TxNumLimit       uint64           `json:"tx_num_limit"`
+	MaxTxSize        uint64           `json:"max_tx_size"`
 }
 
 type ConfigVerifier struct {
 	Address       string `json:"address"`
 	ProposeWeight uint64 `json:"propose_weight"`
 	VoteWeight    uint64 `json:"vote_weight"`
+	Pubkey        string `json:"pub_key"`
 	BLSPubKey     string `json:"bls_pub_key"`
 }
 
@@ -151,7 +153,8 @@ type ConfigMempool struct {
 }
 
 type ConfigExecutor struct {
-	Light bool `json:"light" toml:"light"`
+	Light           bool   `json:"light" toml:"light"`
+	TriedbCacheSize uint64 `json:"triedb_cache_size" toml:"triedb_cache_size"`
 }
 
 type ConfigLogger struct {

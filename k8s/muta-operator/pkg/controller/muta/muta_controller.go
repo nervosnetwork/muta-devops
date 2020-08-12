@@ -469,6 +469,7 @@ func getAddressListAndBlsPubkeyList(keypairs []nervosv1alpha1.KeyPair) []nervosv
 		addressList = append(addressList, nervosv1alpha1.ConfigVerifier{
 			Address:       keypair.Address,
 			BLSPubKey:     keypair.BlsPubkey,
+			Pubkey:        keypair.Pubkey,
 			ProposeWeight: 1,
 			VoteWeight:    1,
 		})
