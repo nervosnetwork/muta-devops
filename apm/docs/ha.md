@@ -49,6 +49,8 @@ Promethues 官方提供了以下两种机制，可以解决单点和数据存储
 ### 生产部署建议
 使用官方提供的的联邦集群来做节点高可用，使用远程存储，统一存储数据
 
+数据的保留时间可以根据存储的选择定期清理，以 InfluxDB 为例子，可以参考 [官方配置](https://docs.influxdata.com/influxdb/v1.8/administration/config/#configuration-overview)
+
 #### 组件列表
 | 组件名 | 参考链接 | 说明 |
 | --- | --- | --- |
@@ -113,6 +115,10 @@ Jaeger 主要由组件:
 Jaeger 各组件之间可以独立存在，通过 RPC 通信，所以生产环境建议部署多个 jaeger-collector 做采集节点的高可用
 
 jaeger-query 建议也部署多个节点，并在前面增加个 nginx 做查询的高可用
+
+
+数据的保留时间可以根据存储的选择定期清理，以 ElasticSearch 为例子，可以参考 [官方 delete Api](https://www.elastic.co/guide/en/elasticsearch/reference/5.6/docs-delete-by-query.html)
+或 [官方的 Curator 项目](https://github.com/elastic/curator)
 
 ### 组件列表
 | 组件名 | 参考链接 | 说明 |
