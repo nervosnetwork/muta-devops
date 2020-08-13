@@ -60,7 +60,7 @@ datasources:
 - name: Prometheus-loki
   type: prometheus
   access: proxy
-  url: http://nginx:8081/loki
+  url: http://muta-loki:3100/loki
   basicAuth: false
 - name: jaeger
   type: jaeger
