@@ -553,21 +553,19 @@
     <td>待补充</td>
   </tr>
   <tr>
-    <td>processed_tx_request</td>
+    <td rowspan="3">processed_tx_request</td>
     <td>Total</td>
     <td>sum(rate(muta_api_request_result_total{type="send_transaction"}[5m]))</td>
     <td>5分钟内每秒发送的交易请求总数</td>
     <td>待补充</td>
   </tr>
   <tr>
-    <td></td>
     <td>Success Total</td>
     <td>sum(rate(muta_api_request_result_total{result="success",type="send_transaction"}[5m]))</td>
     <td>5分钟内每秒发送的交易请求 Success 总数 </td>
     <td>待补充</td>
   </tr>
   <tr>
-    <td></td>
     <td>instance</td>
     <td>rate(muta_api_request_result_total{result="success", type="send_transaction"}[5m])</td>
     <td>5分钟内每个节点每秒发送交易请求 Success 数</td>
