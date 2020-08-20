@@ -698,6 +698,7 @@ avg (sum by (instance) (increase(muta_storage_put_cf_seconds[5m]))) / avg(increa
 </details>
 
 #### get_cf_each_block_time_usage
+
 - description: Average time per block for rocksdb running get_cf
 <details>
 <summary>Legende details</summary>
@@ -777,7 +778,6 @@ Estimate the network message arrival rate in the last five minutes
 /
 # received_count
 (sum(increase(muta_network_message_total{direction="received"}[5m])))
-
 ```
 </details>
 
