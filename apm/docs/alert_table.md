@@ -14,27 +14,27 @@
 <tbody>
   <tr>
     <td rowspan="2">$job：Overall total 5m load &amp; average CPU used%</td>
-    <td>avg(1 - avg(irate(node_cpu_seconds_total{job=~"node_exporter",mode="idle"}[5m])) by (instance)) * 100</td>
+    <td>avg(1 - avg(irate(<br>node_cpu_seconds_total{job=~"node_exporter",mode="idle"}[5m])<br>) <br>by (instance)) * 100</td>
     <td></td>
     <td>60%</td>
     <td>Over 60% utilization of CPU</td>
   </tr>
   <tr>
-    <td>sum(node_load5{job=~"node_exporter"}) / count(node_cpu_seconds_total{job=~"node_exporter", mode='system'})</td>
+    <td>sum(node_load5{job=~"node_exporter"}) <br>/ count(node_cpu_seconds_total{job=~"node_exporter", mode='system'})</td>
     <td></td>
     <td>0.7</td>
     <td>CPU load5 greater than 0.7</td>
   </tr>
   <tr>
     <td>$job：Overall total memory &amp; average memory used%</td>
-    <td>(sum(node_memory_MemTotal_bytes{job=~"node_exporter"} - node_memory_MemAvailable_bytes{job=~"node_exporter"}) / sum(node_memory_MemTotal_bytes{job=~"node_exporter"}))*100</td>
+    <td>(sum(node_memory_MemTotal_bytes{job=~"node_exporter"} <br>-node_memory_MemAvailable_bytes{job=~"node_exporter"})<br>/ sum(node_memory_MemTotal_bytes{job=~"node_exporter"}))*100</td>
     <td></td>
     <td>70%</td>
     <td>Over 70% utilization of memory</td>
   </tr>
   <tr>
     <td>$job：Overall total disk &amp; average disk used%</td>
-    <td>(sum(avg(node_filesystem_size_bytes{job=~"node_exporter",fstype=~"xfs|ext.*"})by(device,instance)) - sum(avg(node_filesystem_free_bytes{job=~"node_exporter",fstype=~"xfs|ext.*"})by(device,instance))) *100/(sum(avg(node_filesystem_avail_bytes{job=~"node_exporter",fstype=~"xfs|ext.*"})by(device,instance))+(sum(avg(node_filesystem_size_bytes{job=~"node_exporter",fstype=~"xfs|ext.*"})by(device,instance)) - sum(avg(node_filesystem_free_bytes{job=~"node_exporter",fstype=~"xfs|ext.*"})by(device,instance))))</td>
+    <td>(sum(avg(node_filesystem_size_bytes{job=~"node_exporter",fstype=~"xfs|ext.*"})<br>by(device,instance))<br> - sum(avg(node_filesystem_free_bytes{job=~"node_exporter",fstype=~"xfs|ext.*"})<br>by(device,instance))) *100<br>/(sum(avg(node_filesystem_avail_bytes{job=~"node_exporter",fstype=~"xfs|ext.*"})<br>by(device,instance))<br>+(sum(avg(node_filesystem_size_bytes{job=~"node_exporter",fstype=~"xfs|ext.*"})<br>by(device,instance))<br> -sum(avg(node_filesystem_free_bytes{job=~"node_exporter",fstype=~"xfs|ext.*"})<br>by(device,instance))))</td>
     <td></td>
     <td>70%</td>
     <td>Over 70% utilization of disk</td>
@@ -62,7 +62,7 @@
   </tr>
   <tr>
     <td>Disk Space Used% Basic</td>
-    <td>(node_filesystem_size_bytes{fstype=~"ext.*|xfs",mountpoint !~".*pod.*"}-node_filesystem_free_bytes{fstype=~"ext.*|xfs",mountpoint !~".*pod.*"}) *100/(node_filesystem_avail_bytes {fstype=~"ext.*|xfs",mountpoint !~".*pod.*"}+(node_filesystem_size_bytes{fstype=~"ext.*|xfs",mountpoint !~".*pod.*"}-node_filesystem_free_bytes{fstype=~"ext.*|xfs",mountpoint !~".*pod.*"}))</td>
+    <td>(node_filesystem_size_bytes{fstype=~"ext.*|xfs",mountpoint !~".*pod.*"}<br>-node_filesystem_free_bytes{fstype=~"ext.*|xfs",mountpoint !~".*pod.*"})*100<br>/(node_filesystem_avail_bytes {fstype=~"ext.*|xfs",mountpoint !~".*pod.*"}<br>+(node_filesystem_size_bytes{fstype=~"ext.*|xfs",mountpoint !~".*pod.*"}<br>-node_filesystem_free_bytes{fstype=~"ext.*|xfs",mountpoint !~".*pod.*"}))</td>
     <td></td>
     <td>70%</td>
     <td>Node disk utilization exceeds 70%</td>
