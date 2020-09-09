@@ -356,7 +356,7 @@ scrape_configs:
   # Muta 应用的状态监控
   - job_name: 'muta_exporter'
     static_configs:
-    - targets: ['192.168.20.211:8000']
+    - targets: ['muta_exporter_ip:8000']
 
   # 配置为 Loki server 所在 ip，端口和例子如下
   # Loki server 的状态监控
