@@ -15,8 +15,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 30,
-  "iteration": 1600614018470,
+  "id": 31,
+  "iteration": 1600618147156,
   "links": [],
   "panels": [
     {
@@ -385,13 +385,13 @@
         {
           "expr": "muta_consensus_height{instance=~\"$node\"}",
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "height",
           "refId": "A"
         },
         {
           "expr": "(muta_consensus_round{instance=~\"$node\"} > 0 )",
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "round",
           "refId": "B"
         }
       ],
@@ -514,6 +514,7 @@
       },
       "yaxes": [
         {
+          "$$hashKey": "object:1512",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -522,6 +523,7 @@
           "show": true
         },
         {
+          "$$hashKey": "object:1513",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -978,12 +980,6 @@
           "interval": "",
           "legendFormat": "received-total",
           "refId": "D"
-        },
-        {
-          "expr": "sum(url:muta_network_message_size:sum5m{direction=\"received\"})",
-          "interval": "",
-          "legendFormat": "",
-          "refId": "E"
         }
       ],
       "thresholds": [],
@@ -1127,7 +1123,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "network_send_by_url_size",
+      "title": "network_send_by_url_size_and_count",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1245,7 +1241,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "network_received_by_url_size",
+      "title": "network_received_by_url_size_and_count",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -2363,7 +2359,7 @@
     ]
   },
   "timezone": "",
-  "title": "muta-network",
-  "uid": "muta-network",
-  "version": 36
+  "title": "muta-network-dev",
+  "uid": "muta-network-dev",
+  "version": 4
 }
