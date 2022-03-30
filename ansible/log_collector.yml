@@ -1,0 +1,51 @@
+---
+- name: install fluent-bit on muta nodes
+  hosts: muta-bench-node*
+  user: ubuntu
+  become: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  tasks:
+    - debug: var=source_ip
+    - name: Install Debian | Add td-agent-bit apt-key
+      apt_key:
+        url: https://packages.fluentbit.io/fluentbit.key
+        state: present
+    - name: Install Debian | Add td-agent-bit repository
+      apt_repository:
+        repo: 'deb https://packages.fluentbit.io/ubuntu/bionic bionic main'
+        state: present
+        filename: td-agent-bit
+        update_cache: true
+    - name: Install fluentbit package
+      package:
+        name: td-agent-bit
+        state: present
+        update_cache: true
+      notify: Restart Fluentbit service
+    - name: copy fluent-bit service
+      copy:
+        src: "td-agent-bit.service"
+        dest: "/lib/systemd/system/td-agent-bit.service"
+      notify: reload systemd deamon
+    - name: copy fluent-bit config
+      template:
+        src: templates/td-agent-bit.conf.j2
+        dest: "/etc/td-agent-bit/td-agent-bit.conf"
+      notify: Restart Fluentbit service
+    - name: copy fluent-bit parser
+      copy:
+        src: "td-agent-parser.conf"
+        dest: "/etc/td-agent-bit/parser.conf"
+      notify: Restart Fluentbit service
+  handlers:
+    - name: Restart Fluentbit service
+      service:
+        name: td-agent-bit
+        enabled: true
+        state: restarted
+    - name: reload systemd deamon
+      service:
+        name: td-agent-bit
+        enabled: true
+        state: reloaded
